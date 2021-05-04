@@ -6,10 +6,11 @@ import numpy as np
 
 class ExplicitRungeKutta:
     """
-    Initialize by giving the number of stages s, the Runge-Kutta matrix,\n
-    which must be a s by s numpy array, with zeros filling the unneeded entries,\n
-    and two arrays of coefficients, c and b, of length s.\n
-    To solve an IVP, use the method `solve`.
+    Initialize this class by giving the number of stages s, the Runge-Kutta matrix,
+    which must be a s by s numpy array, with zeros filling the unneeded entries,
+    and two arrays of coefficients, c and b, of length s.
+    It yields an object capable of solving an IVP using an RK method with the
+    given parameters. To solve such an IVP, use the method `solve`.
     """
 
     def __init__(self, s: int, A: np.array, c: np.array, b: np.array):
@@ -40,18 +41,19 @@ class ExplicitRungeKutta:
 
     def solve(self, f, t0, tf, y0, h):
         """
-        A short description.
-
-        A bit longer description.
+        Use this method to solve an IVP.
 
         Args:
-            variable (type): description
+            f (function): the function f(t, y)
+            t0 (float): the initial point of the solution's interval
+            tf (float): the endpoint of the solution's interval
+            y0 (float): the value of y(t) at t0
+            h (float): the size of the step to be used
 
         Returns:
-            type: description
-
-        Raises:
-            Exception: description
+            (interval, ys) (tuple): returns a tuple of numpy arrays,
+            the first entry being the array of t_n's and the second
+            the array of the corresponding y_n's.
 
         """
         ys = [y0]
@@ -69,9 +71,14 @@ class ExplicitRungeKutta:
 
 
 class RK4(ExplicitRungeKutta):
+    """
+    Initializes the general class `ExplicitRungeKutta` with the parameters for
+    the usual RK4 method. No arguments are needed.
+    """
+
     def __init__(self):
+        s = 4
         rk4_A = np.array([[0, 0, 0, 0], [0.5, 0, 0, 0], [0, 0.5, 0, 0], [0, 0, 1, 0]])
         rk4_c = np.array([0, 0.5, 0.5, 1])
         rk4_b = np.array([1 / 6, 1 / 3, 1 / 3, 1 / 6])
-        super().__init__(rk4_A, rk4_c, rk4_b)
-        erk4 = ExplicitRungeKutta(4, rk4_A, rk4_c, rk4_b)
+        super().__init__(s, rk4_A, rk4_c, rk4_b)
