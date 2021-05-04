@@ -5,6 +5,13 @@ import numpy as np
 
 
 class ExplicitRungeKutta:
+    """
+    Initialize by giving the number of stages s, the Runge-Kutta matrix,\n
+    which must be a s by s numpy array, with zeros filling the unneeded entries,\n
+    and two arrays of coefficients, c and b, of length s.\n
+    To solve an IVP, use the method `solve`.
+    """
+
     def __init__(self, s: int, A: np.array, c: np.array, b: np.array):
         self.s = s
         self.A = A
@@ -32,6 +39,21 @@ class ExplicitRungeKutta:
         return y_n + h * np.sum(self.b * ks)
 
     def solve(self, f, t0, tf, y0, h):
+        """
+        A short description.
+
+        A bit longer description.
+
+        Args:
+            variable (type): description
+
+        Returns:
+            type: description
+
+        Raises:
+            Exception: description
+
+        """
         ys = [y0]
         interval = np.arange(t0, tf, h)
 
@@ -44,3 +66,12 @@ class ExplicitRungeKutta:
 
 
 # %%
+
+
+class RK4(ExplicitRungeKutta):
+    def __init__(self):
+        rk4_A = np.array([[0, 0, 0, 0], [0.5, 0, 0, 0], [0, 0.5, 0, 0], [0, 0, 1, 0]])
+        rk4_c = np.array([0, 0.5, 0.5, 1])
+        rk4_b = np.array([1 / 6, 1 / 3, 1 / 3, 1 / 6])
+        super().__init__(rk4_A, rk4_c, rk4_b)
+        erk4 = ExplicitRungeKutta(4, rk4_A, rk4_c, rk4_b)
