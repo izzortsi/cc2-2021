@@ -64,7 +64,7 @@ orbit_3 = _ys[:, 2, :2]
 # orbit_1
 # %%
 orbits = [orbit_1, orbit_2, orbit_3]
-fig = plt.figure(figsize=(12, 6))
+fig = plt.figure(figsize=(12, 8))
 ax = fig.add_subplot()
 
 ax.set_xlim((-5, 5))
@@ -143,4 +143,4 @@ animation = FuncAnimation(
     fig, update, frames=num_frames, fargs=(orbits, ax), interval=12
 )
 
-animation.save("teste.mp4", dpi=240, bitrate=1500)
+animation.save("3-body-choreography.mp4", dpi=240, bitrate=1500)
