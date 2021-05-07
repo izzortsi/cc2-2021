@@ -92,22 +92,20 @@ class RK4(ExplicitRungeKutta):
 def F(t, y):
     return np.array([-np.exp(3 * t) * y[0]])
 
-    # Running a small integration
-
 
 def F(t, y):
     return np.array([-3 * t])
 
 
-y0 = np.array([10])  # initialize oscillator at x = -5, with 0 velocity.
+y0 = np.array([10])
 t0 = 0
 tf = 30
 h = 0.01
 rk4 = RK4()
 # %%
-rk4.A
+
 ts, ys = rk4.solve(F, t0, tf, y0, h)
-# Running a small integration
+
 # %%
 
 
@@ -117,7 +115,6 @@ fig, ax = plt.subplots(2, 1, figsize=(12, 6), sharex=True)
 ax[0].plot(ts, ys[:, 0], color="C0", lw=6, ls="--", label="Position (rk4)", alpha=0.5)
 ax[0].plot(ts, analytical_solution, color="r", label="Analytical Solution")
 ax[1].plot(ts, ys[:, 1], color="C1", lw=6, alpha=0.5, ls="--", label="Velocity (rk4)")
-ax[1].plot(ts, analytical_velocity, "C2", label="Analytical Solution")
 ax[0].legend(loc="upper center")
 ax[1].legend(loc="upper center")
 ax[-1].set_xlabel("time")
@@ -126,9 +123,3 @@ fig
 
 
 # %%
-
-a = np.array([1, 2, 3])
-a.shape
-b = np.array([[1, 2], [3, 4]])
-b.shape
-b[0]

@@ -90,10 +90,7 @@ class RK4(ExplicitRungeKutta):
 
 
 def F(t, y):
-    """
-    evaluate the SHO at time t and y=y.
-    Note: this diff eq has no time dependence
-    """
+
     ϵ = 5
     du1 = y[1]
     du2 = -(ϵ * (y[0] ** 2 - 1) * y[1] + y[0])
