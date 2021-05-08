@@ -23,7 +23,11 @@ CHOREOGRAPHIES = {
 }
 
 # animation parameters
+<<<<<<< HEAD
 SAVE = True  # if the animation is to be saved as a .mp4 file (rendering might take some time)
+=======
+SAVE = False  # if the animation is to be saved as a .mp4 file (rendering might take some time)
+>>>>>>> a7dde3d4e88e78e80a2146b54b15269a91199577
 DPI = 150 #quality parameters: higher values lead to higher rendering times
 BITRATE = 800 #quality parameters: higher values lead to higher rendering times
 FPS = None
