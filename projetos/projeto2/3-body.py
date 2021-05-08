@@ -8,6 +8,12 @@ from projetos.projeto2.explicit_rk_vectorized import *
 # %%
 N_BODIES = 3
 DIMENSION = 2
+CHOREOGRAPHIES = {
+    "2": {"v": np.array([0.322184765624991, 0.647989160156249]), "T": 51.3958},
+    "3": {"v": np.array([0.257841699218752, 0.687880761718747]), "T": 55.6431},
+    "4": {"v": np.array([0.568991007042164, 0.449428951346711]), "T": 51.9645},
+    "22": {"v": np.array([0.698073236083981, 0.328500769042967]), "T": 100.846},
+}
 
 
 def Fij(ri, rj):
@@ -29,34 +35,36 @@ def F(t, y):
 
 # %%
 # 0.322184765624991, 0.647989160156249
-
-initial_state = np.array(
+choreography_num = "22"
+v = CHOREOGRAPHIES[choreography_num]["v"]
+initial_state = lambda v: np.array(
     [
         -1,
         0,
-        0.322184765624991,
-        0.647989160156249,
+        v[0],
+        v[1],
         1,
         0,
-        0.322184765624991,
-        0.647989160156249,
+        v[0],
+        v[1],
         0,
         0,
-        -0.64436953,
-        -1.29597832,
+        -2 * v[0],
+        -2 * v[1],
     ]
 )
 
 # %%
 
 rk4 = RK4()
+y0 = initial_state(v)
 h = 0.01
 t0 = 0
-tf = 22
-ts, ys = rk4.solve(F, t0, tf, initial_state, h)
+tf = CHOREOGRAPHIES[choreography_num]["T"] / 2
+ts, ys = rk4.solve(F, t0, tf, y0, h)
 
-
-_ys = ys.reshape((int(tf / h), N_BODIES, 4))
+num_ts = len(ts)
+_ys = ys.reshape((num_ts, N_BODIES, 4))
 # _ys
 orbit_1 = _ys[:, 0, :2]
 orbit_2 = _ys[:, 1, :2]
@@ -138,9 +146,6 @@ def update(num, orbits, ax):
         trail.set_data(orbit[:num, 0], orbit[:num, 1])
 
 
-num_frames = len(ts)
-animation = FuncAnimation(
-    fig, update, frames=num_frames, fargs=(orbits, ax), interval=12
-)
+animation = FuncAnimation(fig, update, frames=num_ts, fargs=(orbits, ax), interval=5)
 
-animation.save("3-body-choreography.mp4", dpi=120, bitrate=1500)
+animation.save(f"3-body-choreography_num{choreography_num}.mp4", dpi=160, bitrate=1400)
