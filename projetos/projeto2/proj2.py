@@ -1,5 +1,4 @@
 # %%
-%matplotlib inline
 import os
 import numpy as np
 import numpy.linalg as la
@@ -23,13 +22,9 @@ CHOREOGRAPHIES = {
 }
 
 # animation parameters
-<<<<<<< HEAD
 SAVE = True  # if the animation is to be saved as a .mp4 file (rendering might take some time)
-=======
-SAVE = False  # if the animation is to be saved as a .mp4 file (rendering might take some time)
->>>>>>> a7dde3d4e88e78e80a2146b54b15269a91199577
-DPI = 150 #quality parameters: higher values lead to higher rendering times
-BITRATE = 800 #quality parameters: higher values lead to higher rendering times
+DPI = 75  # quality parameters: higher values lead to higher rendering times
+BITRATE = 800  # quality parameters: higher values lead to higher rendering times
 FPS = None
 INTERVAL = 5
 EXTRA_ARGS = ["-vcodec", "libx264"]
@@ -57,7 +52,7 @@ y0 = np.array(
 
 h = 0.01
 t0 = 0
-tf = CHOREOGRAPHIES[CHOREOGRAPHY_NUM]["T"] / 20
+tf = CHOREOGRAPHIES[CHOREOGRAPHY_NUM]["T"] / 2
 
 # %%
 
@@ -163,6 +158,7 @@ def init_plot():
 
     return [mass1[0], trail1[0], mass2[0], trail2[0], mass3[0], trail3[0]]
 
+
 def update(num, orbits, ax):
 
     for i, orbit in enumerate(orbits):
@@ -197,8 +193,6 @@ if SAVE == True:
         bitrate=BITRATE,
         extra_args=EXTRA_ARGS,
     )
-else:
-    HTML(anim.to_html5_video())
 
 
 # %%
