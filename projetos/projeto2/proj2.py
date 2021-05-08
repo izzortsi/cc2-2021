@@ -1,18 +1,20 @@
 # %%
+%matplotlib inline
 import os
 import numpy as np
 import numpy.linalg as la
-import matplotlib as mpl
 import matplotlib.animation as animation
+from IPython.display import HTML
 from matplotlib import pyplot as plt
-from explicit_rk import *
+from explicit_rk import ExplicitRungeKutta, integrators
+
 
 # %%
 
 # program parameters (untested for N_BODIES > 3 or DIMENSION != 2)
 N_BODIES = 3
 DIMENSION = 2
-CHOREOGRAPHY_NUM = "4"
+CHOREOGRAPHY_NUM = "22"
 CHOREOGRAPHIES = {
     "2": {"v": np.array([0.322184765624991, 0.647989160156249]), "T": 51.3958},
     "3": {"v": np.array([0.257841699218752, 0.687880761718747]), "T": 55.6431},
@@ -20,13 +22,44 @@ CHOREOGRAPHIES = {
     "22": {"v": np.array([0.698073236083981, 0.328500769042967]), "T": 100.846},
 }
 
-# animation quality parameters (higher values lead to higher rendering times)
-DPI = 150
-BITRATE = 800
+# animation parameters
+SAVE = True  # if the animation is to be saved as a .mp4 file (rendering might take some time)
+DPI = 150 #quality parameters: higher values lead to higher rendering times
+BITRATE = 800 #quality parameters: higher values lead to higher rendering times
 FPS = None
 INTERVAL = 5
 EXTRA_ARGS = ["-vcodec", "libx264"]
 # %%
+
+# simulation parameters
+
+v0s = CHOREOGRAPHIES[CHOREOGRAPHY_NUM]["v"]
+y0 = np.array(
+    [
+        -1,
+        0,
+        v0s[0],
+        v0s[1],
+        1,
+        0,
+        v0s[0],
+        v0s[1],
+        0,
+        0,
+        -2 * v0s[0],
+        -2 * v0s[1],
+    ]
+)
+
+h = 0.01
+t0 = 0
+tf = CHOREOGRAPHIES[CHOREOGRAPHY_NUM]["T"] / 20
+
+# %%
+
+# integrator
+integrators
+rk4 = integrators["RK4"]()
 
 
 def Fij(ri, rj):
@@ -46,36 +79,8 @@ def F(t, y):
     return out.flatten()
 
 
-def initial_state(v):
-    y0 = np.array(
-        [
-            -1,
-            0,
-            v[0],
-            v[1],
-            1,
-            0,
-            v[0],
-            v[1],
-            0,
-            0,
-            -2 * v[0],
-            -2 * v[1],
-        ]
-    )
-    return y0
-
-
 # %%
-rk4 = RK4()
-# %%
-# simulation parameters
 
-v0s = CHOREOGRAPHIES[CHOREOGRAPHY_NUM]["v"]
-y0 = initial_state(v0s)
-h = 0.01
-t0 = 0
-tf = CHOREOGRAPHIES[CHOREOGRAPHY_NUM]["T"] / 2
 ts, ys = rk4.solve(F, t0, tf, y0, h)
 
 NUM_TS = len(ts)
@@ -154,10 +159,6 @@ def init_plot():
 
     return [mass1[0], trail1[0], mass2[0], trail2[0], mass3[0], trail3[0]]
 
-
-# %%
-
-
 def update(num, orbits, ax):
 
     for i, orbit in enumerate(orbits):
@@ -178,10 +179,22 @@ anim = animation.FuncAnimation(
     blit=True,
 )
 # %%
-anim.save(
-    f"outputs/3-body-choreography_num{CHOREOGRAPHY_NUM}.mp4",
-    fps=FPS,
-    dpi=DPI,
-    bitrate=BITRATE,
-    extra_args=EXTRA_ARGS,
-)
+
+
+# %%
+if SAVE == True:
+    file_path = os.path.join(
+        "outputs", f"3-body-choreography_num{CHOREOGRAPHY_NUM}.mp4"
+    )
+    anim.save(
+        file_path,
+        fps=FPS,
+        dpi=DPI,
+        bitrate=BITRATE,
+        extra_args=EXTRA_ARGS,
+    )
+else:
+    HTML(anim.to_html5_video())
+
+
+# %%
