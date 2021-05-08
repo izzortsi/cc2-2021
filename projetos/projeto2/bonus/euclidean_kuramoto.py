@@ -16,22 +16,31 @@ mpl.rcParams["image.interpolation"] = "none"
 np.random.seed(0)
 n = 50
 N = n ** 2
-K = 13 * np.sqrt(np.pi)
+K = 4 * np.sqrt(np.pi)
 ω = np.random.rand(N) * 2 * np.pi
 _ω = ω.reshape(n, n)
 θ = np.random.rand(N) * 2 * np.pi
+
+positions = np.array([np.array([i, j]) for i in range(n) for j in range(n)]).reshape(
+    n, n, 2
+)
+
+
+# %%
+
 # %%
 # _ω = ω.reshape(n, n)
 # _θ = θ.reshape(n, n)
 # _θ
 # %%
 # kernel = np.full((5, 5), 1 / 9) + np.diag([i for i in range(5)])
-k_dim = 3
-kernel = np.full((k_dim, k_dim), 1 / k_dim ** 2)
+k_dim = n
+kernel = np.zeros((k_dim, k_dim))
 # kernel
 # %%
+i, j = 10, 20
 
-
+# %%
 def local_convolution(A, f, i, j, kernel):
     k_dim, _ = kernel.shape
     idx_var = k_dim // 2
@@ -52,10 +61,14 @@ def local_convolution(A, f, i, j, kernel):
     if j > k_dim and n - j < k_dim:
         slicey_ker = np.s_[k_dim + j - n - idx_var :]
     kernel_section = kernel[slicex_ker, slicey_ker]
-    phase_difference = f(A[i, j], A_slice)
+    phase_difference = f(A[i, j], A)
+    distances = la.norm(positions - np.array([i, j]), axis=2)
+    distances[i, j] = 1
+    distances = distances ** 2
+    summand = phase_difference / distances
     # print(phase_difference.shape)
-    product = phase_difference * kernel_section
-    return np.sum(product)
+
+    return np.sum(summand)
 
 
 # %%
@@ -71,7 +84,9 @@ def F(t, θ):
         for j in range(n):
             # print(_θ[i, j])
             # dθ[i] = ω[i] + (K / N) * np.sum(np.sin(θ - θ_i))
-            dθ[i, j] = _ω[i, j] + K * local_convolution(_θ, f, i, j, kernel)
+            lconv = local_convolution(_θ, f, i, j, kernel)
+            # print(lconv)
+            dθ[i, j] = _ω[i, j] + K * lconv
     return dθ.flatten()
 
 
@@ -81,7 +96,7 @@ def F(t, θ):
 rk4 = integrators["RK4"]()
 # %%
 
-ts, θs = rk4.solve(F, 0, 120, θ, 1)
+ts, θs = rk4.solve(F, 0, 80, θ, 1)
 NUM_TS = len(ts)
 θs = θs.reshape(NUM_TS, n, n)
 # %%
@@ -114,4 +129,4 @@ anim = animation.FuncAnimation(
 )
 # %%
 
-anim.save("bonus/non-global_kuramoto.mp4", fps=6)
+anim.save("bonus/euclidean_kuramoto.mp4", fps=6)
