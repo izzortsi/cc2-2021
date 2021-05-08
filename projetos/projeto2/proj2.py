@@ -159,11 +159,6 @@ def init_plot():
 
     return [mass1[0], trail1[0], mass2[0], trail2[0], mass3[0], trail3[0]]
 
-
-# %%
-init_plot()
-
-
 def update(num, orbits, ax):
 
     for i, orbit in enumerate(orbits):
@@ -177,6 +172,7 @@ def update(num, orbits, ax):
 anim = animation.FuncAnimation(
     fig,
     update,
+    init_func=init_plot,
     frames=NUM_TS,
     fargs=(orbits, ax),
     interval=INTERVAL,
