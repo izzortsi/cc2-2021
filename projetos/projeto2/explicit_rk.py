@@ -1,6 +1,4 @@
 # %%
-
-
 import numpy as np
 
 
@@ -8,8 +6,7 @@ class ExplicitRungeKutta:
     """
     Initialize this class by giving the number of stages s, the Runge-Kutta matrix,
     which must be a s by s numpy array, with zeros filling the unneeded entries,
-    and two arrays of coefficients, c and b, of length s. Defaults to the classic
-    RK4 method.
+    and two arrays of coefficients, c and b, of length s.
     It yields an object capable of solving an IVP using an RK method with the
     given parameters. To solve such an IVP, use the method `solve`.
     """
@@ -22,23 +19,24 @@ class ExplicitRungeKutta:
         # self.ks = lambda f, t, y, h: self.yield_ks(f, t, y, h)
 
     def yield_ks(self, f, t_n, y_n, h):
-
-        # ks = [f(t_n, y_n)]
-        ks = []
-        for i in range(self.s):
-
-            ks.append(
-                f(
-                    t_n + self.c[i] * h,
-                    y_n + h * (np.sum(np.array(ks) * self.A[i][:i])),
-                )
+        dim = len(y_n)
+        # print(dim)
+        ks = np.zeros((dim, self.s))
+        # print(ks[:, 0])
+        ks[:, 0] = f(
+            t_n + self.c[0] * h, y_n + h * np.sum(ks[:, :0] * self.A[0][:1], axis=1)
+        )
+        for s in range(1, self.s):
+            # print(ks[:, :s], self.A[s][:s])
+            ks[:, s] = f(
+                t_n + self.c[s] * h,
+                y_n + h * np.sum(ks[:, :s] * self.A[s][:s], axis=1),
             )
-
         return ks
 
     def y(self, f, t_n, y_n, h):
         ks = self.yield_ks(f, t_n, y_n, h)
-        return y_n + h * np.sum(self.b * ks)
+        return y_n + h * np.sum(self.b * ks, axis=1)
 
     def solve(self, f, t0, tf, y0, h):
         """
@@ -52,7 +50,7 @@ class ExplicitRungeKutta:
             h (float): the size of the step to be used
 
         Returns:
-            (interval, ys) (tuple): returns a tuple of numpy arrays,
+            (ts, ys) (tuple): returns a tuple of numpy arrays,
             the first entry being the array of t_n's and the second
             the array of the corresponding y_n's.
 
