@@ -2,8 +2,9 @@
 
 import numpy as np
 import numpy.linalg as la
+import matplotlib as mpl
 from matplotlib import pyplot as plt
-from matplotlib.animation import FuncAnimation
+import matplotlib.animation as animation
 from projetos.projeto2.explicit_rk_vectorized import *
 
 # %%
@@ -11,7 +12,7 @@ from projetos.projeto2.explicit_rk_vectorized import *
 # program parameters (untested for N_BODIES > 3 or DIMENSION != 2)
 N_BODIES = 3
 DIMENSION = 2
-CHOREOGRPHY_NUM = "22"
+CHOREOGRAPHY_NUM = "3"
 CHOREOGRAPHIES = {
     "2": {"v": np.array([0.322184765624991, 0.647989160156249]), "T": 51.3958},
     "3": {"v": np.array([0.257841699218752, 0.687880761718747]), "T": 55.6431},
@@ -20,9 +21,11 @@ CHOREOGRAPHIES = {
 }
 
 # animation quality parameters (higher values lead to higher rendering times)
-DPI = 100
-BITRATE = 1200
-
+DPI = 150
+BITRATE = 800
+FPS = None
+INTERVAL = 5
+EXTRA_ARGS = ["-vcodec", "libx264"]
 # %%
 
 
@@ -87,61 +90,69 @@ orbits = [orbit_1, orbit_2, orbit_3]
 
 # %%
 
-fig = plt.figure(figsize=(10, 10))
-ax = fig.add_subplot()
+fig, ax = plt.subplots(figsize=(10, 10))
 
-ax.set_xlim((-5, 5))
-ax.set_ylim((-5, 5))
+
 # %%
+def init_plot():
+    ax.set_xlim((-4, 4))
+    ax.set_ylim((-4, 4))
+    mass1 = ax.plot(
+        [],
+        [],
+        animated=True,
+        c="red",
+        marker="o",
+        markersize=10,
+    )
+    trail1 = ax.plot(
+        [],
+        [],
+        "--",
+        animated=True,
+        c="red",
+        lw=0.4,
+        alpha=0.5,
+    )
 
-mass1 = ax.plot(
-    orbit_1[0, 0],
-    orbit_1[0, 1],
-    c="red",
-    marker="o",
-    markersize=10,
-)
-trail1 = ax.plot(
-    orbit_1[0, 0],
-    orbit_1[0, 1],
-    "--",
-    c="red",
-    lw=0.4,
-    alpha=0.5,
-)
+    mass2 = ax.plot(
+        [],
+        [],
+        animated=True,
+        c="green",
+        marker="o",
+        markersize=10,
+    )
+    trail2 = ax.plot(
+        [],
+        [],
+        "--",
+        animated=True,
+        c="green",
+        lw=0.4,
+        alpha=0.5,
+    )
 
-mass2 = ax.plot(
-    orbit_2[0, 0],
-    orbit_2[0, 1],
-    c="green",
-    marker="o",
-    markersize=10,
-)
-trail2 = ax.plot(
-    orbit_2[0, 0],
-    orbit_2[0, 1],
-    "--",
-    c="green",
-    lw=0.4,
-    alpha=0.5,
-)
+    mass3 = ax.plot(
+        [],
+        [],
+        animated=True,
+        c="blue",
+        marker="o",
+        markersize=10,
+    )
 
-mass3 = ax.plot(
-    orbit_3[0, 0],
-    orbit_3[0, 1],
-    c="blue",
-    marker="o",
-    markersize=10,
-)
+    trail3 = ax.plot(
+        [],
+        [],
+        "--",
+        animated=True,
+        c="blue",
+        lw=0.4,
+        alpha=0.5,
+    )
 
-trail3 = ax.plot(
-    orbit_3[0, 0],
-    orbit_3[0, 1],
-    "--",
-    c="blue",
-    lw=0.4,
-    alpha=0.5,
-)
+    return [mass1[0], trail1[0], mass2[0], trail2[0], mass3[0], trail3[0]]
 
 
 # %%
@@ -154,10 +165,23 @@ def update(num, orbits, ax):
         trail = ax.lines[2 * i + 1]
         mass.set_data(orbit[num, 0], orbit[num, 1])
         trail.set_data(orbit[:num, 0], orbit[:num, 1])
+    return ax.lines
 
 
-animation = FuncAnimation(fig, update, frames=NUM_TS, fargs=(orbits, ax), interval=5)
-
-animation.save(
-    f"3-body-choreography_num{CHOREOGRAPHY_NUM}.mp4", dpi=DPI, bitrate=BITRATE
+anim = animation.FuncAnimation(
+    fig,
+    update,
+    init_func=init_plot,
+    frames=NUM_TS,
+    fargs=(orbits, ax),
+    interval=INTERVAL,
+    blit=True,
+)
+# %%
+anim.save(
+    f"3-body-choreography_num{CHOREOGRAPHY_NUM}.mp4",
+    fps=FPS,
+    dpi=DPI,
+    bitrate=BITRATE,
+    extra_args=EXTRA_ARGS,
 )
