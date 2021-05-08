@@ -14,9 +14,9 @@ mpl.rcParams["image.interpolation"] = "none"
 # %%
 
 np.random.seed(0)
-n = 50
+n = 25
 N = n ** 2
-K = 4 * np.sqrt(np.pi)
+K = 8 * np.sqrt(np.pi)
 ω = np.random.rand(N) * 2 * np.pi
 _ω = ω.reshape(n, n)
 θ = np.random.rand(N) * 2 * np.pi
@@ -96,7 +96,7 @@ def F(t, θ):
 rk4 = integrators["RK4"]()
 # %%
 
-ts, θs = rk4.solve(F, 0, 80, θ, 1)
+ts, θs = rk4.solve(F, 0, 250, θ, 1)
 NUM_TS = len(ts)
 θs = θs.reshape(NUM_TS, n, n)
 # %%
@@ -124,7 +124,6 @@ anim = animation.FuncAnimation(
     frames=NUM_TS,
     fargs=(θs, ax),
     interval=5,
-    blit=True,
     repeat=True,
 )
 # %%
