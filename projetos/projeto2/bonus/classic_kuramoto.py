@@ -35,10 +35,13 @@ ts, θs = rk4.solve(F, 0, 120, θ, 1)
 NUM_TS = len(ts)
 θs = θs.reshape(NUM_TS, n, n)
 # %%
+
+fig, ax = plt.subplots(figsize=(n // 10, n // 10))
+ax.set_axis_off()
+ax.imshow(θs[0])
+
+
 def init_plot():
-    fig, ax = plt.subplots(figsize=(n // 10, n // 10))
-    ax.set_axis_off()
-    ax.imshow(θs[0])
     return ax.images
 
 
@@ -50,12 +53,12 @@ def update(num, θs, ax):
 anim = animation.FuncAnimation(
     fig,
     update,
-    init_func=init_plot,
     frames=NUM_TS,
     fargs=(θs, ax),
     interval=5,
     blit=True,
     repeat=True,
 )
+# %%
 
 anim.save("bonus/kuramoto.mp4", fps=6)
