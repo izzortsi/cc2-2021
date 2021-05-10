@@ -1,12 +1,7 @@
 # %%
-import os
-import numpy as np
-import numpy.linalg as la
-import matplotlib.animation as animation
+from imports import *
 import matplotlib as mpl
-from IPython.display import HTML
-from matplotlib import pyplot as plt
-from explicit_rk import ExplicitRungeKutta, integrators
+
 
 # %%
 # https://matplotlib.org/stable/gallery/images_contours_and_fields/interpolation_methods.html
@@ -28,7 +23,7 @@ def F(t, θ):
     return dθ
 
 
-rk4 = integrators["RK4"]()
+rk4 = Integrators["RK4"]()
 # %%
 
 ts, θs = rk4.solve(F, 0, 120, θ, 1)
@@ -38,7 +33,8 @@ NUM_TS = len(ts)
 
 fig, ax = plt.subplots(figsize=(n // 10, n // 10))
 ax.set_axis_off()
-ax.imshow(θs[0])
+im = ax.imshow(θs[0], vmin=0, vmax=2 * np.pi)
+fig.colorbar(im)
 
 
 def init_plot():
@@ -57,8 +53,7 @@ anim = animation.FuncAnimation(
     fargs=(θs, ax),
     interval=5,
     blit=True,
-    repeat=True,
 )
 # %%
-
-anim.save("bonus/kuramoto_outputs/kuramoto.mp4", fps=6)
+file_path = os.path.join(KURAMOTO_OUTS, "classic_kuramoto.mp4")
+anim.save(file_path, fps=6)

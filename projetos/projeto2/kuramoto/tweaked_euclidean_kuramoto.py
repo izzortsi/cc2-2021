@@ -1,12 +1,7 @@
 # %%
-import os
-import numpy as np
-import numpy.linalg as la
-import matplotlib.animation as animation
+
+from imports import *
 import matplotlib as mpl
-from IPython.display import HTML
-from matplotlib import pyplot as plt
-from explicit_rk import ExplicitRungeKutta, integrators
 
 # %%
 # https://matplotlib.org/stable/gallery/images_contours_and_fields/interpolation_methods.html
@@ -16,17 +11,20 @@ mpl.rcParams["image.interpolation"] = "none"
 np.random.seed(0)
 n = 30
 N = n ** 2
-K = 11 * np.sqrt(np.pi)
+K = (n / np.sqrt(n) * 2 * np.pi) ** np.sqrt(np.pi)
 ω = np.random.rand(N) * 2 * np.pi
 _ω = ω.reshape(n, n)
 θ = np.random.rand(N) * 2 * np.pi
-
+μ = -0.5
 positions = np.array([np.array([i, j]) for i in range(n) for j in range(n)]).reshape(
     n, n, 2
 )
+positions.shape
 
 
 # %%
+
+# in case one also wants to use a convolution kernel
 k_dim = n
 kernel = np.zeros((k_dim, k_dim))
 
@@ -57,8 +55,10 @@ def convolution(A, f, i, j, kernel):
     phase_difference = f(A[i, j], A)
     distances = la.norm(positions - np.array([i, j]), axis=2)
     distances[i, j] = 1
-    distances = distances ** 2
-    summand = phase_difference / distances
+    distances = distances ** μ
+    summand = phase_difference * distances
+    summand[i, j] = A[i, j]
+
     # print(phase_difference.shape)
 
     return np.sum(summand)
@@ -78,18 +78,20 @@ def F(t, θ):
             # print(_θ[i, j])
             # dθ[i] = ω[i] + (K / N) * np.sum(np.sin(θ - θ_i))
             lconv = convolution(_θ, f, i, j, kernel)
+
+            coupling_term = K * lconv
             # print(lconv)
-            dθ[i, j] = _ω[i, j] + K * lconv
+            dθ[i, j] = _ω[i, j] + coupling_term
     return dθ.flatten()
 
 
 # %%
 
 
-rk4 = integrators["RK4"]()
+rk4 = Integrators["RK4"]()
 # %%
 
-ts, θs = rk4.solve(F, 0, 80, θ, 1)
+ts, θs = rk4.solve(F, 0, 30, θ, 1)
 NUM_TS = len(ts)
 θs = θs.reshape(NUM_TS, n, n)
 # %%
@@ -121,4 +123,5 @@ anim = animation.FuncAnimation(
 )
 # %%
 
-anim.save("bonus/euclidean_kuramoto.mp4", fps=6)
+file_path = os.path.join(KURAMOTO_OUTS, "tweaked_euclidean_kuramoto.mp4")
+anim.save(file_path, fps=6)

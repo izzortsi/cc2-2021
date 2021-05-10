@@ -1,13 +1,5 @@
 # %%
-import os
-import sys
-import numpy as np
-import numpy.linalg as la
-import matplotlib.animation as animation
-from IPython.display import HTML
-from matplotlib import pyplot as plt
-from explicit_rk import ExplicitRungeKutta, integrators
-
+from imports import *
 
 # %%
 
@@ -15,12 +7,6 @@ from explicit_rk import ExplicitRungeKutta, integrators
 N_BODIES = 3
 DIMENSION = 2
 CHOREOGRAPHY_NUM = "22"
-CHOREOGRAPHIES = {
-    "2": {"v": np.array([0.322184765624991, 0.647989160156249]), "T": 51.3958},
-    "3": {"v": np.array([0.257841699218752, 0.687880761718747]), "T": 55.6431},
-    "4": {"v": np.array([0.568991007042164, 0.449428951346711]), "T": 51.9645},
-    "22": {"v": np.array([0.698073236083981, 0.328500769042967]), "T": 100.846},
-}
 
 # animation parameters
 SAVE = True  # if the animation is to be saved as a .mp4 file (rendering might take some time)
@@ -32,7 +18,7 @@ EXTRA_ARGS = ["-vcodec", "libx264"]
 # %%
 
 # simulation parameters
-
+print(CHOREOGRAPHIES)
 v0s = CHOREOGRAPHIES[CHOREOGRAPHY_NUM]["v"]
 y0 = np.array(
     [
@@ -58,8 +44,8 @@ tf = CHOREOGRAPHIES[CHOREOGRAPHY_NUM]["T"] / 2
 # %%
 
 # integrator
-integrators
-rk4 = integrators["RK4"]()
+print(Integrators)
+rk4 = Integrators["RK4"]()
 
 
 def Fij(ri, rj):
@@ -95,11 +81,8 @@ orbits = [orbit_1, orbit_2, orbit_3]
 
 # %%
 
+fig, ax = plt.subplots(figsize=(10, 10))
 
-
-# %%
-
-fig, ax = plt.subplots(figsize=(10, 10));
 
 def init_plot():
     ax.set_xlim((-4, 4))
@@ -171,8 +154,8 @@ def update(num, orbits, ax):
         trail.set_data(orbit[:num, 0], orbit[:num, 1])
     return ax.lines
 
-# %%
 
+# %%
 anim = animation.FuncAnimation(
     fig,
     update,
@@ -184,13 +167,9 @@ anim = animation.FuncAnimation(
 )
 
 # %%
-%%timeit -n 1 -r 1
 if SAVE is True:
-    odir_name = "outputs"
-    if not os.path.exists(odir_name):
-        os.mkdir(odir_name)
     file_path = os.path.join(
-        odir_name, f"3-body-choreography_num{CHOREOGRAPHY_NUM}.mp4"
+        THREEBODY_OUTS, f"3-body-choreography_num{CHOREOGRAPHY_NUM}.mp4"
     )
     anim.save(
         file_path,

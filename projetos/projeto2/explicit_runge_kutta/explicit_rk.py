@@ -145,6 +145,3 @@ class RK3G(ExplicitRungeKutta):
         )
 
         super().__init__(s, A, c, b)
-
-
-integrators = {"RK3": RK3, "RK4": RK4, "RK4r38": RK4r38, "RK3G": RK3G}
