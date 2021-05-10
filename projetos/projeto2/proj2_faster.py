@@ -98,65 +98,63 @@ fig, ax = plt.subplots(figsize=(10, 10))
 
 
 # %%
-def init_plot():
-    ax.set_xlim((-4, 4))
-    ax.set_ylim((-4, 4))
-    mass1 = ax.plot(
-        [],
-        [],
-        animated=True,
-        c="red",
-        marker="o",
-        markersize=10,
-    )
-    trail1 = ax.plot(
-        [],
-        [],
-        "--",
-        animated=True,
-        c="red",
-        lw=0.4,
-        alpha=0.5,
-    )
 
-    mass2 = ax.plot(
-        [],
-        [],
-        animated=True,
-        c="green",
-        marker="o",
-        markersize=10,
-    )
-    trail2 = ax.plot(
-        [],
-        [],
-        "--",
-        animated=True,
-        c="green",
-        lw=0.4,
-        alpha=0.5,
-    )
+ax.set_xlim((-4, 4))
+ax.set_ylim((-4, 4))
+mass1 = ax.plot(
+    [],
+    [],
+    animated=True,
+    c="red",
+    marker="o",
+    markersize=10,
+)
+trail1 = ax.plot(
+    [],
+    [],
+    "--",
+    animated=True,
+    c="red",
+    lw=0.4,
+    alpha=0.5,
+)
 
-    mass3 = ax.plot(
-        [],
-        [],
-        animated=True,
-        c="blue",
-        marker="o",
-        markersize=10,
-    )
+mass2 = ax.plot(
+    [],
+    [],
+    animated=True,
+    c="green",
+    marker="o",
+    markersize=10,
+)
+trail2 = ax.plot(
+    [],
+    [],
+    "--",
+    animated=True,
+    c="green",
+    lw=0.4,
+    alpha=0.5,
+)
 
-    trail3 = ax.plot(
-        [],
-        [],
-        "--",
-        animated=True,
-        c="blue",
-        lw=0.4,
-        alpha=0.5,
-    )
+mass3 = ax.plot(
+    [],
+    [],
+    animated=True,
+    c="blue",
+    marker="o",
+    markersize=10,
+)
 
-    return [mass1[0], trail1[0], mass2[0], trail2[0], mass3[0], trail3[0]]
+trail3 = ax.plot(
+    [],
+    [],
+    "--",
+    animated=True,
+    c="blue",
+    lw=0.4,
+    alpha=0.5,
+)
 
 
 def update(num, orbits, ax):
@@ -172,11 +170,9 @@ def update(num, orbits, ax):
 anim = animation.FuncAnimation(
     fig,
     update,
-    init_func=init_plot,
     frames=NUM_TS,
     fargs=(orbits, ax),
     interval=INTERVAL,
-    blit=True,
 )
 # %%
 
@@ -185,7 +181,7 @@ anim = animation.FuncAnimation(
 %%timeit -n 1 -r 1
 if SAVE is True:
     file_path = os.path.join(
-        "outputs", f"3-body-choreography_num{CHOREOGRAPHY_NUM}_slower.mp4"
+        "outputs", f"3-body-choreography_num{CHOREOGRAPHY_NUM}.mp4"
     )
     anim.save(
         file_path,
