@@ -1,5 +1,6 @@
 # %%
 import os
+import sys
 import numpy as np
 import numpy.linalg as la
 import matplotlib.animation as animation
@@ -94,10 +95,12 @@ orbits = [orbit_1, orbit_2, orbit_3]
 
 # %%
 
-fig, ax = plt.subplots(figsize=(10, 10))
 
 
 # %%
+
+fig, ax = plt.subplots(figsize=(10, 10));
+
 def init_plot():
     ax.set_xlim((-4, 4))
     ax.set_ylim((-4, 4))
@@ -168,6 +171,7 @@ def update(num, orbits, ax):
         trail.set_data(orbit[:num, 0], orbit[:num, 1])
     return ax.lines
 
+# %%
 
 anim = animation.FuncAnimation(
     fig,
@@ -178,14 +182,15 @@ anim = animation.FuncAnimation(
     interval=INTERVAL,
     blit=True,
 )
-# %%
-
 
 # %%
 %%timeit -n 1 -r 1
 if SAVE is True:
+    odir_name = "outputs"
+    if not os.path.exists(odir_name):
+        os.mkdir(odir_name)
     file_path = os.path.join(
-        "outputs", f"3-body-choreography_num{CHOREOGRAPHY_NUM}_slower.mp4"
+        odir_name, f"3-body-choreography_num{CHOREOGRAPHY_NUM}.mp4"
     )
     anim.save(
         file_path,
@@ -194,6 +199,4 @@ if SAVE is True:
         bitrate=BITRATE,
         extra_args=EXTRA_ARGS,
     )
-
-
 # %%

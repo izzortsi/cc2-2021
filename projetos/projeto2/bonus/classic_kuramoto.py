@@ -14,7 +14,7 @@ mpl.rcParams["image.interpolation"] = "none"
 # %%
 
 np.random.seed(0)
-n = 25
+n = 40
 N = n ** 2
 K = 1
 ω = np.random.rand(N) * 2 * np.pi
@@ -61,4 +61,4 @@ anim = animation.FuncAnimation(
 )
 # %%
 
-anim.save("bonus/kuramoto.mp4", fps=6)
+anim.save("bonus/kuramoto_outputs/kuramoto.mp4", fps=6)
