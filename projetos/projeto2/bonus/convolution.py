@@ -22,11 +22,6 @@ def convolution(A, kernel):
         if j > k_dim and n - j < k_dim:
             slicey_ker = np.s_[k_dim + j - n - idx_var :]
         kernel_section = kernel[slicex_ker, slicey_ker]
-        # print(i, j)
-        # print(_θ[slicex, slicey].shape)
-        # print(kernel_section.shape)
-        # print(_θ[slicex, slicey])
-        # print(kernel_section)
         product = _θ_slice * kernel_section
         A[i, j] = np.sum(product)
     return A

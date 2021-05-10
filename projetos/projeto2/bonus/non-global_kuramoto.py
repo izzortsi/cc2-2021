@@ -32,7 +32,7 @@ kernel = np.full((k_dim, k_dim), 1 / k_dim ** 2)
 # %%
 
 
-def local_convolution(A, f, i, j, kernel):
+def convolution(A, f, i, j, kernel):
     k_dim, _ = kernel.shape
     idx_var = k_dim // 2
     index_bounds = lambda k: (max(k - idx_var, 0), min(k + idx_var + 1, n))
@@ -71,7 +71,7 @@ def F(t, θ):
         for j in range(n):
             # print(_θ[i, j])
             # dθ[i] = ω[i] + (K / N) * np.sum(np.sin(θ - θ_i))
-            dθ[i, j] = _ω[i, j] + K * local_convolution(_θ, f, i, j, kernel)
+            dθ[i, j] = _ω[i, j] + K * convolution(_θ, f, i, j, kernel)
     return dθ.flatten()
 
 
