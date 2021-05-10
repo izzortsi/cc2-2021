@@ -1,12 +1,6 @@
 # %%
-import os
-import numpy as np
-import numpy.linalg as la
-import matplotlib.animation as animation
+from imports import *
 import matplotlib as mpl
-from IPython.display import HTML
-from matplotlib import pyplot as plt
-from explicit_rk import ExplicitRungeKutta, integrators
 
 # %%
 # https://matplotlib.org/stable/gallery/images_contours_and_fields/interpolation_methods.html
@@ -32,7 +26,7 @@ kernel = np.full((k_dim, k_dim), 1 / k_dim ** 2)
 # %%
 
 
-def local_convolution(A, f, i, j, kernel):
+def convolution(A, f, i, j, kernel):
     k_dim, _ = kernel.shape
     idx_var = k_dim // 2
     index_bounds = lambda k: (max(k - idx_var, 0), min(k + idx_var + 1, n))
@@ -71,14 +65,14 @@ def F(t, θ):
         for j in range(n):
             # print(_θ[i, j])
             # dθ[i] = ω[i] + (K / N) * np.sum(np.sin(θ - θ_i))
-            dθ[i, j] = _ω[i, j] + K * local_convolution(_θ, f, i, j, kernel)
+            dθ[i, j] = _ω[i, j] + K * convolution(_θ, f, i, j, kernel)
     return dθ.flatten()
 
 
 # %%
 
 
-rk4 = integrators["RK4"]()
+rk4 = Integrators["RK4"]()
 # %%
 
 ts, θs = rk4.solve(F, 0, 120, θ, 1)
@@ -90,8 +84,8 @@ NUM_TS = len(ts)
 # %%
 fig, ax = plt.subplots(figsize=(n // 10, n // 10))
 ax.set_axis_off()
-ax.imshow(θs[0])
-fig
+im = ax.imshow(θs[0], vmin=0, vmax=2 * np.pi)
+fig.colorbar(im)
 
 
 def init_plot():
@@ -110,8 +104,8 @@ anim = animation.FuncAnimation(
     fargs=(θs, ax),
     interval=5,
     blit=True,
-    repeat=True,
 )
 # %%
 
-anim.save("bonus/non-global_kuramoto.mp4", fps=6)
+file_path = os.path.join(KURAMOTO_OUTS, "nonglobal_kuramoto.mp4")
+anim.save(file_path, fps=6)
