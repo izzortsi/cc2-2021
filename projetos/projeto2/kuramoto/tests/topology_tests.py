@@ -1,12 +1,7 @@
 # %%
-import os
-import numpy as np
-import numpy.linalg as la
-import matplotlib.animation as animation
+from imports import *
 import matplotlib as mpl
-from IPython.display import HTML
-from matplotlib import pyplot as plt
-from explicit_rk import ExplicitRungeKutta, integrators
+
 
 # %%
 # https://matplotlib.org/stable/gallery/images_contours_and_fields/interpolation_methods.html
