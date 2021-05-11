@@ -10,7 +10,7 @@ CHOREOGRAPHY_NUM = "22"
 
 # animation parameters
 SAVE = True  # if the animation is to be saved as a .mp4 file (rendering might take some time)
-DPI = 150  # quality parameters: higher values lead to higher rendering times
+DPI = 80  # quality parameters: higher values lead to higher rendering times
 BITRATE = 800  # quality parameters: higher values lead to higher rendering times
 FPS = None
 INTERVAL = 5
