@@ -51,10 +51,9 @@ def convolution(A, f, i, j, kernel):
     phase_difference = f(A[i, j], A)
     distances = la.norm(positions - np.array([i, j]), axis=2)
     distances[i, j] = 1
-    distances = distances ** 2
-    summand = phase_difference / distances
-    # print(phase_difference.shape)
-
+    distances = distances ** -2
+    summand = phase_difference * distances
+    # print(summand[i, j])
     return np.sum(summand)
 
 
@@ -72,8 +71,9 @@ def F(t, θ):
             # print(_θ[i, j])
             # dθ[i] = ω[i] + (K / N) * np.sum(np.sin(θ - θ_i))
             lconv = convolution(_θ, f, i, j, kernel)
+            coupling_term = K * lconv
             # print(lconv)
-            dθ[i, j] = _ω[i, j] + K * lconv
+            dθ[i, j] = _ω[i, j] + coupling_term
     return dθ.flatten()
 
 
