@@ -4,13 +4,53 @@ import matplotlib as mpl
 from scipy.signal import convolve2d
 from scipy.signal.signaltools import wiener
 
+
+def kernel_core(s, r):
+    rm = np.minimum(r, 1)
+    if s.kernel_type == 0:
+        return (4 * rm * (1 - rm)) ** 4
+    else:
+        return np.exp(4 - 1 / (rm * (1 - rm)))
+
+
+Lenia.kernel_core = kernel_core
+
+
+def kernel_shell(s, r):
+    k = len(s.peaks)
+    kr = k * r
+    peak = s.peaks[np.minimum(np.floor(kr).astype(int), k - 1)]
+    return (r < 1) * s.kernel_core(kr % 1) * peak
+
+
+Lenia.kernel_shell = kernel_shell
+
+
+def calc_kernel(s):
+    I = np.array(
+        [
+            np.arange(SIZE),
+        ]
+        * SIZE
+    )
+    X = (I - MID) / s.R
+    Y = X.T
+    D = np.sqrt(X ** 2 + Y ** 2)
+
+    s.kernel = s.kernel_shell(D)
+    s.kernel_sum = np.sum(s.kernel)
+    kernel_norm = s.kernel / s.kernel_sum
+    s.kernel_FFT = np.fft.fft2(kernel_norm)
+
+
+Lenia.calc_kernel = calc_kernel
 # %%
 # https://matplotlib.org/stable/gallery/images_contours_and_fields/interpolation_methods.html
 mpl.rcParams["image.interpolation"] = "none"
 # %%
 
 np.random.seed(0)
-n = 50
+n = 25
 N = n ** 2
 K = np.sqrt(np.pi)
 ω = np.random.rand(N) * 2 * np.pi
@@ -22,7 +62,7 @@ _θ = θ.reshape(n, n)
 # _θ
 # %%
 # kernel = np.full((5, 5), 1 / 9) + np.diag([i for i in range(5)])
-k_dim = 7
+k_dim = 5
 
 
 def F(t, θ):
@@ -41,10 +81,13 @@ def F(t, θ):
     return dθ.flatten()
 
 
-integrator = Integrators["ForwardEuler"]()
 # %%
 
-ts, θs = integrator.solve(F, 0, 60, θ, 1)
+
+rk4 = Integrators["ForwardEuler"]()
+# %%
+
+ts, θs = rk4.solve(F, 0, 40, θ, 1)
 NUM_TS = len(ts)
 θs = θs.reshape(NUM_TS, n, n)
 # %%
@@ -76,5 +119,5 @@ anim = animation.FuncAnimation(
 )
 # %%
 
-file_path = os.path.join(KURAMOTO_OUTS, "nonglobal_kuramoto_filters.mp4")
+file_path = os.path.join(KURAMOTO_OUTS, "nonglobal_kuramoto_gaussian.mp4")
 anim.save(file_path, fps=6)

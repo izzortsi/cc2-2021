@@ -9,17 +9,20 @@ mpl.rcParams["image.interpolation"] = "none"
 # %%
 
 np.random.seed(0)
-n = 100
+n = 25
 N = n ** 2
 K = 1
 ω = np.random.rand(N) * 2 * np.pi
 θ = np.random.rand(N) * 2 * np.pi
+α = np.random.randn(N)
 
 
 def F(t, θ):
     dθ = np.zeros_like(θ)
     for i, θ_i in enumerate(θ):
-        dθ[i] = ω[i] - ((K / N) * np.sum(np.sin(θ_i - θ)))
+        dθ[i] = ω[i] * np.cos(α[i] * t) - (
+            (K / N) * np.sum(np.sin(θ_i - θ) + α[i] * np.sin(t * (θ_i - θ)))
+        )
     #        print((K / N) * np.sum(np.sin(θ_i - θ)), dθ[i])
     return dθ
 
@@ -27,7 +30,7 @@ def F(t, θ):
 integrator = Integrators["ForwardEuler"]()
 # %%
 
-ts, θs = integrator.solve(F, 0, 80, θ, 0.1)
+ts, θs = integrator.solve(F, 0, 50, θ, 0.1)
 NUM_TS = len(ts)
 θs = θs.reshape(NUM_TS, n, n)
 # %%
@@ -63,5 +66,5 @@ anim = animation.FuncAnimation(
     blit=True,
 )
 # %%
-file_path = os.path.join(KURAMOTO_OUTS, "classic_kuramoto.mp4")
+file_path = os.path.join(KURAMOTO_OUTS, "global_nonautonomous_kuramoto.mp4")
 anim.save(file_path, fps=6)

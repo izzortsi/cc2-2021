@@ -4,8 +4,10 @@ import numpy as np
 import numpy.linalg as la
 import matplotlib.animation as animation
 from matplotlib import pyplot as plt
+from numba import jit
 from explicit_runge_kutta.explicit_rk import ExplicitRungeKutta
 from explicit_runge_kutta.integrators import Integrators
+
 
 KURAMOTO_OUTS = os.path.join("kuramoto", "kuramoto_outputs")
 if not os.path.exists(KURAMOTO_OUTS):

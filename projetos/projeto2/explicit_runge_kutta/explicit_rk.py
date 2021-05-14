@@ -26,6 +26,7 @@ class ExplicitRungeKutta:
         ks[:, 0] = f(
             t_n + self.c[0] * h, y_n + h * np.sum(ks[:, :0] * self.A[0][:1], axis=1)
         )
+
         for s in range(1, self.s):
             # print(ks[:, :s], self.A[s][:s])
             ks[:, s] = f(
@@ -116,6 +117,69 @@ class RK4r38(ExplicitRungeKutta):
         )
 
 
+class ForwardEuler(ExplicitRungeKutta):
+    """
+    Initializes a subclass of `ExplicitRungeKutta` implementing the forward Euler method.
+    """
+
+    def __init__(self):
+        pass
+
+    def y(self, f, t_n, y_n, h):
+
+        return y_n + h * f(t_n, y_n)
+
+    def solve(self, f, t0, tf, y0, h):
+        """
+        Use this method to solve an IVP.
+
+        Args:
+            f (function): the function f(t, y)
+            t0 (float): the initial point of the solution's interval
+            tf (float): the endpoint of the solution's interval
+            y0 (float): the value of y(t) at t0
+            h (float): the size of the step to be used
+
+        Returns:
+            (ts, ys) (tuple): returns a tuple of numpy arrays,
+            the first entry being the array of t_n's and the second
+            the array of the corresponding y_n's.
+
+        """
+        ys = [y0]
+        interval = np.arange(t0, tf, h)
+
+        y = lambda t_n, y_n: self.y(f, t_n, y_n, h)
+
+        for t_n in interval[1:]:
+            ys.append(y(t_n, ys[-1]))
+
+        return interval, np.array(ys)
+
+
+class RK2G(ExplicitRungeKutta):
+    """
+    Initializes the general class `ExplicitRungeKutta` with the parameters for
+    the generic second-order method (taken from en.wikipedia.org/wiki/List_of_Runge–Kutta_methods#Second-order_methods_with_two_stages.)
+    Defaults α defaults to 1/2, yielding the midpoint method.
+    α = 1 yields the Heun's method, whereas α = 2/3 yields the Ralston method.
+    Args:
+        α = 0.5 (float): must be non-zero
+    """
+
+    def __init__(self, α=1 / 2):
+
+        s = 2
+
+        A = np.array([[0, 0], [α, 0]])
+
+        c = np.array([0, α])
+
+        b = np.array([1 - 1 / 2 * α, 1 / 2 * α])
+
+        super().__init__(s, A, c, b)
+
+
 class RK3G(ExplicitRungeKutta):
     """
     Initializes the general class `ExplicitRungeKutta` with the parameters for
@@ -123,24 +187,24 @@ class RK3G(ExplicitRungeKutta):
     from en.wikipedia.org/wiki/List_of_Runge–Kutta_methods#Generic_third-order_method.)
 
     Args:
-        alpha (float): must be non-zero
+        α (float): must be non-zero
     """
 
-    def __init__(self, alpha):
+    def __init__(self, α):
 
         s = 3
 
         afun = lambda a: (1 - a) / a * (3 * a - 2)
 
-        A = np.array([[0, 0, 0], [alpha, 0, 0], [1 + afun(alpha), -afun(alpha), 0]])
+        A = np.array([[0, 0, 0], [α, 0, 0], [1 + afun(α), -afun(α), 0]])
 
-        c = np.array([0, alpha, 1])
+        c = np.array([0, α, 1])
 
         b = np.array(
             [
-                1 / 2 - 1 / 6 * alpha,
-                1 / (6 * alpha * (1 - alpha)),
-                (2 - 3 * alpha) / 6 * (1 - alpha),
+                1 / 2 - 1 / 6 * α,
+                1 / (6 * α * (1 - α)),
+                (2 - 3 * α) / 6 * (1 - α),
             ]
         )
 

@@ -1,6 +1,11 @@
 # %%
 from imports import *
 import matplotlib as mpl
+from scipy.signal import convolve2d
+
+
+# %%
+
 
 # %%
 # https://matplotlib.org/stable/gallery/images_contours_and_fields/interpolation_methods.html
@@ -10,7 +15,7 @@ mpl.rcParams["image.interpolation"] = "none"
 np.random.seed(0)
 n = 50
 N = n ** 2
-K = 13 * np.sqrt(np.pi)
+K = np.sqrt(np.pi / 2)
 ω = np.random.rand(N) * 2 * np.pi
 _ω = ω.reshape(n, n)
 θ = np.random.rand(N) * 2 * np.pi
@@ -20,37 +25,8 @@ _ω = ω.reshape(n, n)
 # _θ
 # %%
 # kernel = np.full((5, 5), 1 / 9) + np.diag([i for i in range(5)])
-k_dim = 3
+k_dim = 7
 kernel = np.full((k_dim, k_dim), 1 / k_dim ** 2)
-# kernel
-# %%
-
-
-def convolution(A, f, i, j, kernel):
-    k_dim, _ = kernel.shape
-    idx_var = k_dim // 2
-    index_bounds = lambda k: (max(k - idx_var, 0), min(k + idx_var + 1, n))
-
-    min_i, max_i = index_bounds(i)
-    min_j, max_j = index_bounds(j)
-
-    slicex = np.s_[min_i:max_i]
-    slicey = np.s_[min_j:max_j]
-    A_slice = A[slicex, slicey]
-    sx, sy = A[slicex, slicey].shape
-
-    slicex_ker = np.s_[0:sx]
-    slicey_ker = np.s_[0:sy]
-    if i > k_dim and n - i < k_dim:
-        slicex_ker = np.s_[k_dim + i - n - idx_var :]
-    if j > k_dim and n - j < k_dim:
-        slicey_ker = np.s_[k_dim + j - n - idx_var :]
-    kernel_section = kernel[slicex_ker, slicey_ker]
-    phase_difference = f(A[i, j], A_slice)
-    # print(phase_difference.shape)
-    product = phase_difference * kernel_section
-    return np.sum(product)
-
 
 # %%
 
@@ -60,25 +36,33 @@ def F(t, θ):
     # dθ = dθ.reshape(n, n)
     _θ = θ.reshape(n, n)
     dθ = np.zeros_like(_θ)
+
     f = lambda θ_i, θ_j: np.sin(θ_j - θ_i)
+
     for i in range(n):
         for j in range(n):
             # print(_θ[i, j])
-            # dθ[i] = ω[i] + (K / N) * np.sum(np.sin(θ - θ_i))
-            dθ[i, j] = _ω[i, j] + K * convolution(_θ, f, i, j, kernel)
+            phase_differences = np.sin(_θ - _θ[i, j])
+            # _θ[i, j] = 1
+            dθ[i, j] = _ω[i, j] + K * np.sum(convolve2d(phase_differences, kernel))
     return dθ.flatten()
 
 
 # %%
 
 
-rk4 = Integrators["RK4"]()
+integrator = Integrators["ForwardEuler"]()
+# %%
+# precompile functions
+# integrator.solve(F, 0, 2, θ, 1)
 # %%
 
-ts, θs = rk4.solve(F, 0, 120, θ, 1)
+ts, θs = integrator.solve(F, 0, 60, θ, 1)
 NUM_TS = len(ts)
 θs = θs.reshape(NUM_TS, n, n)
 # %%
+np.min(θs)
+np.max(θs)
 
 
 # %%
