@@ -40,20 +40,25 @@ def main():
     u_numerical = numerical_solution(A, u0, t)
 
     fig, axs = plt.subplots(DIM + 1, 1, figsize=(8, 2 * DIM))
+    
     errors = []
     for i in range(DIM):
         error_i = np.abs(u_analytical[i] - u_numerical[i])
         errors.append(error_i)
         axs[i].plot(t, u_analytical[i], label=f'Analytical solution (u{i+1})')
         axs[i].plot(t, u_numerical[i], '--', label=f'Numerical solution (u{i+1})')
-        axs[i].set_xlabel('Time')
+        
+        if i == DIM - 1: 
+            axs[i].set_xlabel('Time')
+
         axs[i].set_ylabel(f'u{i+1}')
         axs[i].legend()
 
-        axs[-1].plot(t, error_i, label=f'solution (u{i+1})')
+        axs[-1].plot(t, error_i, label=f'(u{i+1})')
         axs[-1].set_xlabel('Time')
-        axs[-1].set_ylabel('Error')
+        axs[-1].set_ylabel('Absolute error (log scale)')
         axs[-1].set_title('Errors between analytical and numerical solutions')
+        axs[-1].set_yscale('log')
         axs[-1].legend()
 
     plt.tight_layout()
@@ -68,8 +73,8 @@ if __name__ == "__main__":
     )
     parser.add_argument("-dim", "--dimension", type=int, help="The dimension of the matrix A and vector u0", default = 0)
     parser.add_argument("--seed", type=int, help="Random seed to be used if randomly sampling the coefficients of A", default = -1)
-    parser.add_argument("--time_step", type=float, help="", default = 1e-3)
-    parser.add_argument("--final_time", type=float, help="", default = 2.0)
+    parser.add_argument("--time_step", type=float, help="", default = 1e-4)
+    parser.add_argument("--final_time", type=float, help="", default = 5.0)
     parser.add_argument("--coefs_range", type=float, help="", default = 4.0)
     args = parser.parse_args()
 
